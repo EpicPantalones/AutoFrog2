@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Relay Control</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Relay Control Panel</h1>
+        <div class="grid">
+            {% for ch, config in channels.items() %}
+            <div class="card" data-channel="{{ ch }}">
+                <input type="text" value="{{ config.name }}" class="name-input">
+                <button class="toggle-btn">{{ 'ON' if config.state else 'OFF' }}</button>
+                <div class="time-set">
+                    <label>On Time: <input type="time" class="on-time" value="{{ config.on_time or '' }}"></label>
+                    <label>Off Time: <input type="time" class="off-time" value="{{ config.off_time or '' }}"></label>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+<script>
+document.querySelectorAll('.card').forEach(card => {
+    const channel = card.dataset.channel;
+    const nameInput = card.querySelector('.name-input');
+    const toggleBtn = card.querySelector('.toggle-btn');
+    const onTimeInput = card.querySelector('.on-time');
+    const offTimeInput = card.querySelector('.off-time');
+
+    function postUpdate(data) {
+        fetch('/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({...data, channel})
+        });
+    }
+
+    nameInput.addEventListener('change', () => {
+        postUpdate({name: nameInput.value});
+    });
+
+    toggleBtn.addEventListener('click', () => {
+        const newState = toggleBtn.textContent === 'OFF';
+        toggleBtn.textContent = newState ? 'ON' : 'OFF';
+        postUpdate({state: newState});
+    });
+
+    onTimeInput.addEventListener('change', () => {
+        postUpdate({on_time: onTimeInput.value});
+    });
+
+    offTimeInput.addEventListener('change', () => {
+        postUpdate({off_time: offTimeInput.value});
+    });
+});
+</script>
+</body>
+</html>
+
