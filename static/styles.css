@@ -1,14 +1,42 @@
 body {
+    background-image: url('/static/background.jpg');
+    background-repeat: repeat;
+    background-size: initial;
+    background-position: top left;
+    background-attachment: fixed;
     margin: 0;
     padding: 0;
-    font-family: 'Helvetica Neue', sans-serif;
-    background: #f5f5f5;
+    min-height: 10vh;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
+    position: relative;
+    max-width: 900px; /* or desired content width */
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    /* b3c6f4 */
+    background: rgba(179, 198, 244, 0.9);
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 8px; /* optional */
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+}
+
+header {
+    text-align: center;
+    padding: 1em 0;
+}
+header img {
+    display: inline-block;
 }
 
 h1 {
@@ -24,7 +52,7 @@ h1 {
 }
 
 .card {
-    background: #fff;
+    background: #7a91d6;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -36,11 +64,13 @@ h1 {
 .name-input {
     width: 100%;
     text-align: center;
+    background: #526fbf;
     margin-bottom: 10px;
     padding: 8px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 1px solid #526fbf;
+    border-radius: 16px;
+    color: #fff;
 }
 
 .toggle-btn {
@@ -53,6 +83,18 @@ h1 {
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+}
+
+.add-time-set {
+    width: 120px;
+    background: #2b7a3b;
+    color: #fff;
+}
+
+.remove-time-set {
+    width: 80px;
+    background: #9b4848;
+    color: #fff;
 }
 
 .toggle-btn:hover {
@@ -68,11 +110,12 @@ h1 {
 
 label {
     font-size: 14px;
-    color: #555;
+    color: #000;
 }
 input[type="time"] {
     width: 100%;
     padding: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid #b3c6f4;
+    background: #b3c6f4;
     border-radius: 6px;
 }

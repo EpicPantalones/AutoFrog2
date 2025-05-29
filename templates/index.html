@@ -2,21 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Relay Control</title>
+    <title>AutoFrog Relay Control</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Relay Control Panel</h1>
+        <div class="overlay"></div>
+        <div class="content">
+        <header>
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Relay Control Panel">
+        </header>
         <div class="grid">
             {% for ch, config in channels.items() %}
             <div class="card" data-channel="{{ ch }}">
                 <input type="text" value="{{ config.name }}" class="name-input">
                 <button class="toggle-btn">{{ 'ON' if config.state else 'OFF' }}</button>
-                <div class="time-set">
-                    <label>On Time: <input type="time" class="on-time" value="{{ config.on_time or '' }}"></label>
-                    <label>Off Time: <input type="time" class="off-time" value="{{ config.off_time or '' }}"></label>
+                <div class="time-sets">
+                    {% for time_pair in config.time_sets %}
+                    <div class="time-set">
+                        <label>On Time: <input type="time" class="on-time" value="{{ time_pair.on }}"></label>
+                        <label>Off Time: <input type="time" class="off-time" value="{{ time_pair.off }}"></label>
+                        <button class="toggle-btn remove-time-set">Remove</button>
+                    </div>
+                    {% endfor %}
                 </div>
+                <button class="toggle-btn add-time-set">Add Time</button>                             
             </div>
             {% endfor %}
         </div>
@@ -26,37 +36,73 @@
 document.querySelectorAll('.card').forEach(card => {
     const channel = card.dataset.channel;
     const nameInput = card.querySelector('.name-input');
-    const toggleBtn = card.querySelector('.toggle-btn');
-    const onTimeInput = card.querySelector('.on-time');
-    const offTimeInput = card.querySelector('.off-time');
+    const toggleBtn = card.querySelector('.toggle-btn:not(.add-time-set):not(.remove-time-set)');
+    const container = card.querySelector('.time-sets');
+    const addBtn = card.querySelector('.add-time-set');
 
-    function postUpdate(data) {
+    function postUpdate(timeSets) {
         fetch('/update', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({...data, channel})
+            body: JSON.stringify({channel, time_sets: timeSets})
         });
     }
 
+    function collectTimeSets() {
+        const sets = [];
+        container.querySelectorAll('.time-set').forEach(ts => {
+            const onVal = ts.querySelector('.on-time').value;
+            const offVal = ts.querySelector('.off-time').value;
+            sets.push({on: onVal, off: offVal});
+        });
+        return sets;
+    }
+
     nameInput.addEventListener('change', () => {
-        postUpdate({name: nameInput.value});
+        fetch('/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({channel, name: nameInput.value})
+        });
     });
 
     toggleBtn.addEventListener('click', () => {
         const newState = toggleBtn.textContent === 'OFF';
         toggleBtn.textContent = newState ? 'ON' : 'OFF';
-        postUpdate({state: newState});
+        fetch('/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({channel, state: newState})
+        });
     });
 
-    onTimeInput.addEventListener('change', () => {
-        postUpdate({on_time: onTimeInput.value});
+    container.addEventListener('change', (e) => {
+        if (e.target.classList.contains('on-time') || e.target.classList.contains('off-time')) {
+            postUpdate(collectTimeSets());
+        }
     });
 
-    offTimeInput.addEventListener('change', () => {
-        postUpdate({off_time: offTimeInput.value});
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-time-set')) {
+            e.target.parentElement.remove();
+            postUpdate(collectTimeSets());
+        }
+    });
+
+    addBtn.addEventListener('click', () => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'time-set';
+        wrapper.innerHTML = `
+            <label>On Time: <input type="time" class="on-time"></label>
+            <label>Off Time: <input type="time" class="off-time"></label>
+            <button class="toggle-btn remove-time-set">Remove</button>
+        `;
+        container.appendChild(wrapper);
+        postUpdate(collectTimeSets());
     });
 });
 </script>
+</div>
+</div>
 </body>
 </html>
-
