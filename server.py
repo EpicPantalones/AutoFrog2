@@ -4,11 +4,10 @@ import threading
 import time
 import json
 import os
+from password import PASSWORD, SESSION_KEY
 
 app = Flask(__name__)
-app.secret_key = 'ced39497188d58b951e9d473a00d3faa0972217ca88c714aee9ac97ac0b61175'
-
-PASSWORD = '@ut0Fr0g!'
+app.secret_key = SESSION_KEY
 
 STATE_FILE = "state.json"
 
