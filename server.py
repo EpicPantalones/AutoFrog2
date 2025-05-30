@@ -20,7 +20,6 @@ GPIO_MAP = {
     6: 13,
     7: 19,
     8: 26,
-    
 }
 
 class PersistentState:
@@ -30,7 +29,7 @@ class PersistentState:
                 str(i): {
                     "name": f"Channel {i}",
                     "time_sets": [],
-                    "current_state": False
+                    "current_state": True
                 } for i in range(1, 9)
             }
         }
