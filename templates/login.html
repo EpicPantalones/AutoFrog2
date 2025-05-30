@@ -16,6 +16,12 @@
             color: #fff;
         }
 
+        .login-logo {
+            display: block;
+            width: 320px;
+            margin: 0 auto 20px auto;
+        }
+
         .login-box {
             background: rgba(0, 0, 0, 0.0);
             padding: 2rem 3rem;
@@ -68,6 +74,7 @@
 </head>
 <body>
     <form class="login-box" method="post">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="logo" class="login-logo">
         <h1>Enter Access Token</h1>
         {% if error %}
             <div class="error">{{ error }}</div>
