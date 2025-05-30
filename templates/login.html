@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - AutoFrog Control</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4a90e2, #357ABD);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .login-box {
+            background: rgba(0, 0, 0, 0.0);
+            padding: 2rem 3rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.0);
+            width: 320px;
+            text-align: center;
+        }
+
+        .login-box h1 {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #ffffff;
+        }
+
+        .login-box input[type="password"] {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .login-box input[type="submit"] {
+            width: 100%;
+            padding: 0.6rem 0;
+            border: none;
+            border-radius: 4px;
+            background-color: #2C69D1;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-box input[type="submit"]:hover {
+            background-color: #245bb5;
+        }
+
+        .error {
+            color: #ff6666;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <form class="login-box" method="post">
+        <h1>Enter Access Token</h1>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="submit" value="Unlock">
+    </form>
+</body>
+</html>

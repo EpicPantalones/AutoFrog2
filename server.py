@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from datetime import datetime
 import threading
 import time
@@ -6,6 +6,9 @@ import json
 import os
 
 app = Flask(__name__)
+app.secret_key = 'ced39497188d58b951e9d473a00d3faa0972217ca88c714aee9ac97ac0b61175'
+
+PASSWORD = '@ut0Fr0g!'
 
 STATE_FILE = "state.json"
 
@@ -107,7 +110,21 @@ threading.Thread(target=scheduler, daemon=True).start()
 
 @app.route('/')
 def index():
-    return render_template('index.html', channels=channels)
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    # Your existing index page rendering logic here
+    return render_template('index.html', channels=channels)  # Placeholder
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        entered = request.form.get('password', '')
+        if entered == PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error='Invalid password')
+    return render_template('login.html')
 
 @app.route('/update', methods=['POST'])
 def update():
