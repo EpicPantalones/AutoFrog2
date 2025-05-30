@@ -80,7 +80,8 @@ channels = get_runtime_channels()
 
 def control_gpio(channel, state):
     # Placeholder for GPIO control
-    print(f"GPIO Control - Channel: {channel}, State: {'ON' if state else 'OFF'}")
+    channel_name = channels.get(channel, {}).get("name", f"Channel {channel}")
+    print(f"GPIO Control: {channel_name} was turned {'ON' if state else 'OFF'}")
 
 def scheduler():
     while True:
