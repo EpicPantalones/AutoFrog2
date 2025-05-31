@@ -11,7 +11,7 @@ app.secret_key = SESSION_KEY
 
 STATE_FILE = "state.json"
 
-GPIO_MAP = {
+GPIO_RELAY_MAP = {
     1: 17,
     2: 27,
     3: 22,
@@ -82,7 +82,7 @@ channels = get_runtime_channels()
 def control_gpio(channel, state):
     # Placeholder for GPIO control
     channel_name = channels.get(channel, {}).get("name", f"Channel {channel}")
-    print(f"GPIO Control: {channel_name} was turned {'ON' if state else 'OFF'}")
+    print(f"GPIO Control: {channel_name} was turned {'ON' if state else 'OFF'} (pin {GPIO_RELAY_MAP.get(channel, 'unknown')})")
 
 def scheduler():
     while True:
