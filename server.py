@@ -4,6 +4,12 @@ import threading
 import time
 import json
 import os
+try:
+    import RPi.GPIO as GPIO
+    GPIO_AVAILABLE = True
+except ImportError:
+    GPIO_AVAILABLE = False
+    print("RPi.GPIO not available - running in simulation mode")
 from password import PASSWORD, SESSION_KEY
 
 app = Flask(__name__)
@@ -12,15 +18,26 @@ app.secret_key = SESSION_KEY
 STATE_FILE = "state.json"
 
 GPIO_RELAY_MAP = {
-    1: 17,
-    2: 27,
-    3: 22,
-    4: 5,
-    5: 6,
-    6: 13,
-    7: 19,
-    8: 26,
+    1: 11,
+    2: 12,
+    3: 13,
+    4: 15,
+    5: 16,
+    6: 18,
+    7: 22,
+    8: 29,
 }
+
+# Initialize GPIO
+def init_gpio():
+    if GPIO_AVAILABLE:
+        GPIO.setmode(GPIO.BOARD)
+        for channel, pin in GPIO_RELAY_MAP.items():
+            GPIO.setup(pin, GPIO.OUT)
+            GPIO.output(pin, GPIO.HIGH)  # Initialize as HIGH (relay off)
+        print("GPIO initialized - all relays set to HIGH (OFF)")
+    else:
+        print("GPIO simulation mode - no actual pins controlled")
 
 class PersistentState:
     def __init__(self):
@@ -80,9 +97,18 @@ def get_runtime_channels():
 channels = get_runtime_channels()
 
 def control_gpio(channel, state):
-    # Placeholder for GPIO control
-    channel_name = channels.get(channel, {}).get("name", f"Channel {channel}")
-    print(f"GPIO Control: {channel_name} was turned {'ON' if state else 'OFF'} (pin {GPIO_RELAY_MAP.get(channel, 'unknown')})")
+    if GPIO_AVAILABLE:
+        pin = GPIO_RELAY_MAP.get(channel)
+        if pin:
+            # For relays, typically LOW = ON, HIGH = OFF
+            GPIO.output(pin, GPIO.LOW if state else GPIO.HIGH)
+            channel_name = channels.get(channel, {}).get("name", f"Channel {channel}")
+            print(f"GPIO Control: {channel_name} turned {'ON' if state else 'OFF'} (pin {pin})")
+        else:
+            print(f"Error: No GPIO pin mapped for channel {channel}")
+    else:
+        channel_name = channels.get(channel, {}).get("name", f"Channel {channel}")
+        print(f"GPIO Simulation: {channel_name} would be turned {'ON' if state else 'OFF'} (pin {GPIO_RELAY_MAP.get(channel, 'unknown')})")
 
 def scheduler():
     while True:
@@ -149,4 +175,10 @@ def update():
     return jsonify(success=True)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    init_gpio()
+    try:
+        app.run(host='0.0.0.0', port=5000)
+    finally:
+        if GPIO_AVAILABLE:
+            GPIO.cleanup()
+            print("GPIO cleanup completed")
